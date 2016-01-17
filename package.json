@@ -1,0 +1,32 @@
+{
+  "name": "d3-creed",
+  "version": "0.0.1",
+  "description": "Force layout chart based on d3.js",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syaning/creed.git"
+  },
+  "keywords": [
+    "force",
+    "layout",
+    "graph",
+    "directed",
+    "d3"
+  ],
+  "author": "Alex Sun <syaningv@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/syaning/creed/issues"
+  },
+  "homepage": "https://github.com/syaning/creed#readme",
+  "dependencies": {
+    "d3": "^3.5.12"
+  },
+  "devDependencies": {
+    "webpack": "^1.12.11"
+  }
+}
