@@ -89,6 +89,32 @@ return /******/ (function(modules) { // webpackBootstrap
 			.size([width, height])
 			.charge(opts.force.charge)
 			.linkDistance(opts.force.linkDistance);
+
+		// drag event
+		if (opts.drag.enable) {
+			this.force.drag()
+				.on('dragstart', function(d) {
+					d3.event.sourceEvent.stopPropagation();
+					if (opts.drag.fix) {
+						d.fixed = true;
+					}
+				});
+		}
+
+		// zoom event
+		if (opts.zoom.enable) {
+			var zoom = d3.behavior.zoom()
+				.scaleExtent(opts.zoom.scaleExtent)
+				.on('zoom', function() {
+					var transform = 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')';
+					this.glink.attr('transform', transform);
+					this.gnode.attr('transform', transform);
+				}.bind(this));
+			svg.call(zoom);
+			if (!opts.zoom.dblclick) {
+				svg.on('dblclick.zoom', null);
+			}
+		}
 	}
 
 	Creed.extend = function(name, fn) {
@@ -163,6 +189,15 @@ return /******/ (function(modules) { // webpackBootstrap
 		node: {
 			radius: 5,
 			fill: '#1f77b4'
+		},
+		drag: {
+			enable: true,
+			fix: false
+		},
+		zoom: {
+			enable: false,
+			scaleExtent: [0.5, 2],
+			dblclick: false
 		}
 	};
 
@@ -214,6 +249,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			.classed('node', true)
 			.attr('r', scales.radius)
 			.attr('fill', scales.fill);
+		if (this.opts.drag.enable) {
+			nodes.call(this.force.drag);
+		}
 		return nodes;
 	}
 
