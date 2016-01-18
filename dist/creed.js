@@ -178,8 +178,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		width: 0,
 		height: 0,
 		force: {
-			charge: -300,
-			linkDistance: 100
+			charge: -120,
+			linkDistance: 30
 		},
 		link: {
 			isArc: false,
