@@ -75,6 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		this.opts = opts = util.merge(opts, options);
+
 		var container = this.container = d3.select(opts.container);
 		var width = opts.width || parseInt(container.style('width'), 10);
 		var height = opts.height || parseInt(container.style('height'), 10) || width * 0.75 >> 0;
@@ -111,11 +112,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = {
 		isObject: isObject,
+		isFunction: isFunction,
 		merge: merge
 	};
 
 	function isObject(val) {
 		return val !== null && typeof val === 'object';
+	}
+
+	function isFunction(val) {
+		return typeof val === 'function';
 	}
 
 	function merge(to, from) {
@@ -150,35 +156,27 @@ return /******/ (function(modules) { // webpackBootstrap
 			linkDistance: 100
 		},
 		link: {
-			width: [1, 3],
-			stroke: {},
-			type: 'line' // line or arc
+			isArc: false,
+			stroke: '#999',
+			strokeWidth: 1
 		},
 		node: {
-			radius: [10, 25],
-			fill: {}
-		},
-		text: {
-			show: true,
-			overlay: true,
-			text: '' // string or function
-		},
-		hooks: {
-			preDraw: null,
-			postDraw: null
-		},
-		zoom: true,
-		dragfix: true
+			radius: 5,
+			fill: '#1f77b4'
+		}
 	};
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	var createScales = __webpack_require__(6);
 
 	module.exports = render;
 
 	function render(data) {
 		this.data = data;
+		this.scales = createScales.call(this, data);
 
 		var links = createLinks.call(this, data);
 		var nodes = createNodes.call(this, data);
@@ -189,24 +187,33 @@ return /******/ (function(modules) { // webpackBootstrap
 			.start();
 	}
 
-	function createLinks(nodes) {
-		var linkType = this.opts.link.type === 'arc' ? 'path' : 'line';
-		var links = this.glink.selectAll(linkType)
+	function createLinks(data) {
+		var isArc = this.opts.link.isArc;
+		var scales = this.scales;
+
+		var links = this.glink.selectAll('.link')
 			.data(data.links)
 			.enter()
-			.append(linkType)
-			.attr('fill', 'none')
-			.attr('stroke', 'red')
-			.attr('stroke-width', 1);
+			.append(isArc ? 'path' : 'line')
+			.classed('link', true)
+			.attr('stroke', scales.stroke)
+			.attr('stroke-width', scales.strokeWidth);
+		if (isArc) {
+			links.attr('fill', 'none');
+		}
 		return links;
 	}
 
 	function createNodes(data) {
-		var nodes = this.gnode.selectAll('circle')
+		var scales = this.scales;
+
+		var nodes = this.gnode.selectAll('.node')
 			.data(data.nodes)
 			.enter()
 			.append('circle')
-			.attr('r', 5);
+			.classed('node', true)
+			.attr('r', scales.radius)
+			.attr('fill', scales.fill);
 		return nodes;
 	}
 
@@ -214,20 +221,18 @@ return /******/ (function(modules) { // webpackBootstrap
 		var context = this;
 
 		function lineLink(links) {
-			links.attr({
-				x1: function(d) {
+			links.attr('x1', function(d) {
 					return d.source.x;
-				},
-				y1: function(d) {
+				})
+				.attr('y1', function(d) {
 					return d.source.y;
-				},
-				x2: function(d) {
+				})
+				.attr('x2', function(d) {
 					return d.target.x;
-				},
-				y2: function(d) {
+				})
+				.attr('y2', function(d) {
 					return d.target.y;
-				}
-			});
+				});
 		}
 
 		function arcLink(links) {
@@ -240,12 +245,36 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		return function tick() {
-			context.opts.link.type === 'arc' ? arcLink(links) : lineLink(links);
+			context.opts.link.isArc ? arcLink(links) : lineLink(links);
 
 			nodes.attr('transform', function(d) {
 				return 'translate(' + d.x + ',' + d.y + ')';
 			});
 		};
+	}
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var d3 = __webpack_require__(2);
+	var isFunction = __webpack_require__(3).isFunction;
+
+	module.exports = createScales;
+
+	function createScales(data) {
+		var opts = this.opts;
+
+		return {
+			stroke: getScale(opts.link.stroke),
+			strokeWidth: getScale(opts.link.strokeWidth),
+			radius: getScale(opts.node.radius),
+			fill: getScale(opts.node.fill)
+		};
+
+		function getScale(scale) {
+			return isFunction(scale) ? scale(data) : scale;
+		}
 	}
 
 /***/ }
