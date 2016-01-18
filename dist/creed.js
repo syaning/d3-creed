@@ -64,6 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var util = __webpack_require__(3);
 	var options = __webpack_require__(4);
 	var render = __webpack_require__(5);
+	var clear = __webpack_require__(7);
 
 	module.exports = Creed;
 
@@ -125,6 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Creed.extend('render', render);
+	Creed.extend('clear', clear);
 
 /***/ },
 /* 2 */
@@ -313,6 +315,17 @@ return /******/ (function(modules) { // webpackBootstrap
 		function getScale(scale) {
 			return isFunction(scale) ? scale(data) : scale;
 		}
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = clear;
+
+	function clear() {
+		this.glink.selectAll('*').remove();
+		this.gnode.selectAll('*').remove();
 	}
 
 /***/ }
