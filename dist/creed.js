@@ -237,7 +237,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		var isArc = this.opts.link.isArc;
 		var scales = this.scales;
 
-		var links = this.glink.selectAll('.link')
+		// in case that isArc changes before rerendering
+		this.glink.selectAll((isArc ? 'line' : 'path') + '.link')
+			.remove();
+
+		var links = this.glink.selectAll((isArc ? 'path' : 'line') + '.link')
 			.data(data.links);
 		links.enter()
 			.append(isArc ? 'path' : 'line')
