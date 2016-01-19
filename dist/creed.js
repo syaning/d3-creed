@@ -212,15 +212,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = render;
 
 	function render(data) {
-		this.data = data;
+		var force = this.force;
+
+		if (data) {
+			force.nodes(data.nodes)
+				.links(data.links);
+		} else {
+			data = {
+				nodes: force.nodes(),
+				links: force.links()
+			};
+		}
+
 		this.scales = createScales.call(this, data);
 
 		var links = createLinks.call(this, data);
 		var nodes = createNodes.call(this, data);
 
-		this.force.nodes(data.nodes)
-			.links(data.links)
-			.on('tick', tickFn.call(this, links, nodes))
+		force.on('tick', tickFn.call(this, links, nodes))
 			.start();
 	}
 
@@ -229,12 +238,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		var scales = this.scales;
 
 		var links = this.glink.selectAll('.link')
-			.data(data.links)
-			.enter()
+			.data(data.links);
+		links.enter()
 			.append(isArc ? 'path' : 'line')
 			.classed('link', true)
 			.attr('stroke', scales.stroke)
 			.attr('stroke-width', scales.strokeWidth);
+		links.exit().remove();
 		if (isArc) {
 			links.attr('fill', 'none');
 		}
@@ -245,15 +255,18 @@ return /******/ (function(modules) { // webpackBootstrap
 		var scales = this.scales;
 
 		var nodes = this.gnode.selectAll('.node')
-			.data(data.nodes)
-			.enter()
+			.data(data.nodes);
+		nodes.enter()
 			.append('circle')
 			.classed('node', true)
 			.attr('r', scales.radius)
 			.attr('fill', scales.fill);
+		nodes.exit().remove();
+
 		if (this.opts.drag.enable) {
 			nodes.call(this.force.drag);
 		}
+
 		return nodes;
 	}
 
