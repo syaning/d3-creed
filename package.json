@@ -15,7 +15,8 @@
     "layout",
     "graph",
     "directed",
-    "d3"
+    "d3",
+    "creed"
   ],
   "author": "Alex Sun <syaningv@gmail.com>",
   "license": "MIT",
