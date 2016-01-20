@@ -84,6 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			.attr('width', width)
 			.attr('height', height)
 			.classed('creed', true);
+		this.defs = svg.append('defs');
 		this.glink = svg.append('g').classed('creed-links', true);
 		this.gnode = svg.append('g').classed('creed-nodes', true);
 		this.force = d3.layout.force()
@@ -185,6 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		},
 		link: {
 			isArc: false,
+			arrow: false,
 			stroke: '#999',
 			strokeWidth: 1
 		},
@@ -243,15 +245,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		var links = this.glink.selectAll((isArc ? 'path' : 'line') + '.link')
 			.data(data.links);
+		// update
+		links.attr('stroke', scales.stroke)
+			.attr('stroke-width', scales.strokeWidth);
+		// enter
 		links.enter()
 			.append(isArc ? 'path' : 'line')
 			.classed('link', true)
 			.attr('stroke', scales.stroke)
 			.attr('stroke-width', scales.strokeWidth);
+		// exit
 		links.exit().remove();
+
 		if (isArc) {
 			links.attr('fill', 'none');
 		}
+
 		return links;
 	}
 
@@ -260,11 +269,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		var nodes = this.gnode.selectAll('.node')
 			.data(data.nodes);
+		// update
+		nodes.attr('r', scales.radius)
+			.attr('fill', scales.fill);
+		// enter
 		nodes.enter()
 			.append('circle')
 			.classed('node', true)
 			.attr('r', scales.radius)
 			.attr('fill', scales.fill);
+		// exit
 		nodes.exit().remove();
 
 		if (this.opts.drag.enable) {
