@@ -188,7 +188,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    link: {
 	        isArc: false,
-	        arrow: false,
 	        stroke: '#999',
 	        strokeWidth: 1
 	    },
