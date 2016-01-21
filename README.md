@@ -2,6 +2,8 @@
 
 Force layout chart based on [d3.js](http://d3js.org/).
 
+See [demos](http://syaning.com/creed/).
+
 ## Install
 
 ```
@@ -43,3 +45,58 @@ Render the chart with given data. The parameter can be omitted when performing a
 ### creed.clear()
 
 Clear the chart.
+
+### creed.extend(name, fn)
+
+Extend creed's prototype.
+
+## Option
+
+Default option is
+
+```javascript
+{
+    container: null,
+    width: 0,
+    height: 0,
+    force: {
+        charge: -120,
+        linkDistance: 30
+    },
+    link: {
+        isArc: false,
+        stroke: '#999',
+        strokeWidth: 1
+    },
+    node: {
+        radius: 5,
+        fill: '#1f77b4'
+    },
+    drag: {
+        enable: true,
+        fix: false
+    },
+    zoom: {
+        enable: false,
+        scaleExtent: [0.5, 2],
+        dblclick: false
+    }
+}
+```
+
+for the following options:
+
+- `link.stroke`
+- `link.strokeWidth`
+- `node.radius`
+- `node.fill`
+
+they can be a primitive value or a function which returns a funtion, for example:
+
+```javascript
+function(data) {
+    return function(d) {
+        // return a primitive value
+    };
+}
+```
