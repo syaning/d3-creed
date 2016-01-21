@@ -1,6 +1,6 @@
 {
   "name": "d3-creed",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Force layout chart based on d3.js",
   "main": "index.js",
   "scripts": {

@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = Creed;
 
-	Creed.version = '0.1.0';
+	Creed.version = '0.1.1';
 
 	function Creed(opts) {
 	    if (!(this instanceof Creed)) {
