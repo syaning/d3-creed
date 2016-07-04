@@ -12,7 +12,11 @@ const defaults = {
     right: 0,
     bottom: 0,
     left: 0
-  }
+  },
+  stroke: '#999',
+  strokeWidth: 1,
+  radius: 5,
+  fill: '#1f77b4'
 }
 
 module.exports = Creed
@@ -89,6 +93,9 @@ proto.render = function(data) {
  * @private
  */
 proto._renderLinks = function() {
+  var stroke = valFn(this.stroke)
+  var strokeWidth = valFn(this.strokeWidth)
+
   var links = this.glink.selectAll('.link')
     .data(this.data.links)
 
@@ -99,6 +106,8 @@ proto._renderLinks = function() {
   links.enter()
     .append('line')
     .classed('link', true)
+    .attr('stroke', stroke)
+    .attr('stroke-width', strokeWidth)
 
   // exit
   links.exit().remove()
@@ -112,6 +121,9 @@ proto._renderLinks = function() {
  * @private
  */
 proto._renderNodes = function() {
+  var radius = valFn(this.radius)
+  var fill = valFn(this.fill)
+
   var nodes = this.gnode.selectAll('.node')
     .data(this.data.nodes)
 
@@ -122,7 +134,8 @@ proto._renderNodes = function() {
   nodes.enter()
     .append('circle')
     .classed('node', true)
-    .attr('r', 5)
+    .attr('r', radius)
+    .attr('fill', fill)
 
 
   // exit
@@ -159,4 +172,24 @@ proto._tick = function() {
 proto.clear = function() {
   this.glink.selectAll('*').remove()
   this.gnode.selectAll('*').remove()
+}
+
+/**
+ * Value function.
+ *
+ * @param  {*} val
+ * @param {Object} data
+ * @private
+ */
+function valFn(val, data) {
+  if (typeof val !== 'function') {
+    return val
+  }
+
+  try {
+    var ret = val(data)
+    return typeof ret === 'function' ? ret : val
+  } catch (err) {
+    return val
+  }
 }
