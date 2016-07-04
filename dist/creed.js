@@ -7,7 +7,7 @@
 		exports["creed"] = factory(require("d3"));
 	else
 		root["creed"] = factory(root["d3"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -54,315 +54,166 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1);
+	'use strict';
 
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
+	var d3 = __webpack_require__(1);
 
-	var d3 = __webpack_require__(2);
-	var util = __webpack_require__(3);
-	var options = __webpack_require__(4);
-	var render = __webpack_require__(5);
-	var clear = __webpack_require__(7);
+	/**
+	 * Default options.
+	 */
+	var defaults = {
+	  target: '#chart',
+	  width: 600,
+	  height: 400,
+	  margin: {
+	    top: 0,
+	    right: 0,
+	    bottom: 0,
+	    left: 0
+	  }
+	};
 
 	module.exports = Creed;
 
-	Creed.version = '0.1.1';
+	/**
+	 * Creed.
+	 *
+	 * @param {Object} options
+	 * @public
+	 */
+	function Creed(options) {
+	  if (!(this instanceof Creed)) {
+	    return new Creed(options);
+	  }
 
-	function Creed(opts) {
-	    if (!(this instanceof Creed)) {
-	        return new Creed(opts);
-	    }
-
-	    this.opts = opts = util.merge(opts, options);
-
-	    var container = this.container = d3.select(opts.container);
-	    var width = opts.width || parseInt(container.style('width'), 10);
-	    var height = opts.height || parseInt(container.style('height'), 10) || width * 0.75 >> 0;
-	    var svg = this.svg = container.append('svg')
-	        .attr('width', width)
-	        .attr('height', height)
-	        .classed('creed', true);
-	    this.defs = svg.append('defs');
-	    this.glink = svg.append('g').classed('creed-links', true);
-	    this.gnode = svg.append('g').classed('creed-nodes', true);
-	    this.force = d3.layout.force()
-	        .size([width, height])
-	        .charge(opts.force.charge)
-	        .linkDistance(opts.force.linkDistance);
-
-	    // drag event
-	    if (opts.drag.enable) {
-	        this.force.drag()
-	            .on('dragstart', function(d) {
-	                d3.event.sourceEvent.stopPropagation();
-	                if (opts.drag.fix) {
-	                    d.fixed = true;
-	                }
-	            });
-	    }
-
-	    // zoom event
-	    if (opts.zoom.enable) {
-	        var zoom = d3.behavior.zoom()
-	            .scaleExtent(opts.zoom.scaleExtent)
-	            .on('zoom', function() {
-	                var transform = 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')';
-	                this.glink.attr('transform', transform);
-	                this.gnode.attr('transform', transform);
-	            }.bind(this));
-	        svg.call(zoom);
-	        if (!opts.zoom.dblclick) {
-	            svg.on('dblclick.zoom', null);
-	        }
-	    }
+	  Object.assign(this, defaults, options);
+	  this._init();
 	}
 
-	Creed.extend = function(name, fn) {
-	    if (!fn || typeof fn !== 'function') {
-	        return;
-	    }
-	    Creed.prototype[name] = fn;
+	/**
+	 * Creed prototype.
+	 */
+	var proto = Creed.prototype;
+
+	/**
+	 * Initialize the chart.
+	 *
+	 * @private
+	 */
+	proto._init = function () {
+	  var width = this.width;
+	  var height = this.height;
+	  var margin = this.margin;
+
+	  var innerWidth = this.innerWidth = width - margin.left - margin.right;
+	  var innerHeight = this.innerHeight = height - margin.top - margin.bottom;
+
+	  this.target = d3.select(this.target);
+	  this.svg = this.target.append('svg').attr('width', width).attr('height', height).classed('creed', true);
+	  this.defs = this.svg.append('defs');
+	  this.chart = this.svg.append('g').attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+	  this.glink = this.chart.append('g').classed('links', true);
+	  this.gnode = this.chart.append('g').classed('nodes', true);
+
+	  this.force = d3.layout.force().size([innerWidth, innerHeight]);
 	};
 
-	Creed.extend('render', render);
-	Creed.extend('clear', clear);
+	/**
+	 * Render chart.
+	 *
+	 * @param  {Object} data
+	 * @public
+	 */
+	proto.render = function (data) {
+	  this.data = data;
+	  this.links = this._renderLinks();
+	  this.nodes = this._renderNodes();
 
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	    isObject: isObject,
-	    isFunction: isFunction,
-	    merge: merge
+	  var force = this.force;
+	  force.nodes(data.nodes).links(data.links);
+	  force.on('tick', this._tick()).start();
 	};
 
-	function isObject(val) {
-	    return val !== null && typeof val === 'object';
-	}
+	/**
+	 * Render links.
+	 *
+	 * @private
+	 */
+	proto._renderLinks = function () {
+	  var links = this.glink.selectAll('.link').data(this.data.links);
 
-	function isFunction(val) {
-	    return typeof val === 'function';
-	}
+	  // update
+	  // TODO
 
-	function merge(to, from) {
-	    to = to || {};
-	    from = from || {};
-	    var key, toVal, fromVal;
+	  // enter
+	  links.endter().append('line').classed('link', true);
 
-	    for (key in from) {
-	        if (!to.hasOwnProperty(key)) {
-	            to[key] = from[key];
-	        } else {
-	            toVal = to[key];
-	            fromVal = from[key];
-	            if (isObject(toVal) && isObject(fromVal)) {
-	                merge(toVal, fromVal);
-	            }
-	        }
-	    }
-	    return to;
-	}
+	  // exit
+	  links.exit().remove();
 
-
-/***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	    container: null,
-	    width: 0,
-	    height: 0,
-	    force: {
-	        charge: -120,
-	        linkDistance: 30
-	    },
-	    link: {
-	        isArc: false,
-	        stroke: '#999',
-	        strokeWidth: 1
-	    },
-	    node: {
-	        radius: 5,
-	        fill: '#1f77b4'
-	    },
-	    drag: {
-	        enable: true,
-	        fix: false
-	    },
-	    zoom: {
-	        enable: false,
-	        scaleExtent: [0.5, 2],
-	        dblclick: false
-	    }
+	  return links;
 	};
 
+	/**
+	 * Render nodes.
+	 *
+	 * @private
+	 */
+	proto._renderNodes = function () {
+	  var nodes = this.gnode.selectAll('.node').data(this.data.nodes);
+
+	  // update
+	  // TODO
+
+	  // enter
+	  nodes.enter().append('circle').classed('node', true).attr('r', 5);
+
+	  // exit
+	  nodes.exit().remove();
+
+	  return nodes;
+	};
+
+	/**
+	 * Tick function.
+	 *
+	 * @private
+	 */
+	proto._tick = function () {
+	  var self = this;
+
+	  return function tick() {
+	    self.links.attr('x1', function (d) {
+	      return d.source.x;
+	    }).attr('y1', function (d) {
+	      return d.source.y;
+	    }).attr('x2', function (d) {
+	      return d.target.x;
+	    }).attr('y2', function (d) {
+	      return d.target.y;
+	    });
+
+	    self.nodes.attr('transform', function (d) {
+	      return 'translate(' + d.x + ', ' + d.y + ')';
+	    });
+	  };
+	};
+
+	/**
+	 * Clear chart.
+	 *
+	 * @public
+	 */
+	proto.clear = function () {
+	  this.glink.selectAll('*').remove();
+	  this.gnode.selectAll('*').remove();
+	};
 
 /***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var createScales = __webpack_require__(6);
-
-	module.exports = render;
-
-	function render(data) {
-	    var force = this.force;
-
-	    if (data) {
-	        force.nodes(data.nodes)
-	            .links(data.links);
-	    } else {
-	        data = {
-	            nodes: force.nodes(),
-	            links: force.links()
-	        };
-	    }
-
-	    this.scales = createScales.call(this, data);
-
-	    var links = createLinks.call(this, data);
-	    var nodes = createNodes.call(this, data);
-
-	    force.on('tick', tickFn.call(this, links, nodes))
-	        .start();
-	}
-
-	function createLinks(data) {
-	    var isArc = this.opts.link.isArc;
-	    var scales = this.scales;
-
-	    // in case that isArc changes before rerendering
-	    this.glink.selectAll((isArc ? 'line' : 'path') + '.link')
-	        .remove();
-
-	    var links = this.glink.selectAll((isArc ? 'path' : 'line') + '.link')
-	        .data(data.links);
-	    // update
-	    links.attr('stroke', scales.stroke)
-	        .attr('stroke-width', scales.strokeWidth);
-	    // enter
-	    links.enter()
-	        .append(isArc ? 'path' : 'line')
-	        .classed('link', true)
-	        .attr('stroke', scales.stroke)
-	        .attr('stroke-width', scales.strokeWidth);
-	    // exit
-	    links.exit().remove();
-
-	    if (isArc) {
-	        links.attr('fill', 'none');
-	    }
-
-	    return links;
-	}
-
-	function createNodes(data) {
-	    var scales = this.scales;
-
-	    var nodes = this.gnode.selectAll('.node')
-	        .data(data.nodes);
-	    // update
-	    nodes.attr('r', scales.radius)
-	        .attr('fill', scales.fill);
-	    // enter
-	    nodes.enter()
-	        .append('circle')
-	        .classed('node', true)
-	        .attr('r', scales.radius)
-	        .attr('fill', scales.fill);
-	    // exit
-	    nodes.exit().remove();
-
-	    if (this.opts.drag.enable) {
-	        nodes.call(this.force.drag);
-	    }
-
-	    return nodes;
-	}
-
-	function tickFn(links, nodes) {
-	    var context = this;
-
-	    function lineLink(links) {
-	        links.attr('x1', function(d) {
-	                return d.source.x;
-	            })
-	            .attr('y1', function(d) {
-	                return d.source.y;
-	            })
-	            .attr('x2', function(d) {
-	                return d.target.x;
-	            })
-	            .attr('y2', function(d) {
-	                return d.target.y;
-	            });
-	    }
-
-	    function arcLink(links) {
-	        links.attr('d', function(d) {
-	            var dx = d.target.x - d.source.x;
-	            var dy = d.target.y - d.source.y;
-	            var dr = Math.sqrt(dx * dx + dy * dy);
-	            return 'M' + d.source.x + ',' + d.source.y + 'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x + ',' + d.target.y;
-	        });
-	    }
-
-	    return function tick() {
-	        context.opts.link.isArc ? arcLink(links) : lineLink(links);
-
-	        nodes.attr('transform', function(d) {
-	            return 'translate(' + d.x + ',' + d.y + ')';
-	        });
-	    };
-	}
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var d3 = __webpack_require__(2);
-	var isFunction = __webpack_require__(3).isFunction;
-
-	module.exports = createScales;
-
-	function createScales(data) {
-	    var opts = this.opts;
-
-	    return {
-	        stroke: getScale(opts.link.stroke),
-	        strokeWidth: getScale(opts.link.strokeWidth),
-	        radius: getScale(opts.node.radius),
-	        fill: getScale(opts.node.fill)
-	    };
-
-	    function getScale(scale) {
-	        return isFunction(scale) ? scale(data) : scale;
-	    }
-	}
-
-
-/***/ },
-/* 7 */
+/* 1 */
 /***/ function(module, exports) {
 
-	module.exports = clear;
-
-	function clear() {
-	    this.glink.selectAll('*').remove();
-	    this.gnode.selectAll('*').remove();
-	}
-
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ }
 /******/ ])
