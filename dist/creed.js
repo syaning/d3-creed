@@ -146,7 +146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // TODO
 
 	  // enter
-	  links.endter().append('line').classed('link', true);
+	  links.enter().append('line').classed('link', true);
 
 	  // exit
 	  links.exit().remove();

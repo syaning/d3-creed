@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/syaning/creed#readme",
   "dependencies": {
-    "d3": "^3.5.12"
+    "d3": "^3.5.17"
   },
   "devDependencies": {
     "babel-loader": "^6.2.4",

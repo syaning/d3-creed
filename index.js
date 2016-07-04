@@ -96,7 +96,7 @@ proto._renderLinks = function() {
   // TODO
 
   // enter
-  links.endter()
+  links.enter()
     .append('line')
     .classed('link', true)
 
