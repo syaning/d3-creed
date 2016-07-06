@@ -55,4 +55,4 @@ Clear the chart.
 
 ### License
 
-[MIT]()
+[MIT](./LICENSE)
