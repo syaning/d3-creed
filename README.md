@@ -1,4 +1,4 @@
-# creed
+# d3-creed
 
 Force layout chart based on [d3.js](http://d3js.org/).
 
@@ -27,7 +27,7 @@ chart.render({
 or in browser:
 
 ```html
-<script src="path/to/creed.min.js"></script>
+<script src="path/to/d3-creed.min.js"></script>
 <script>
     var chart = creed({
         target: '#chart'
