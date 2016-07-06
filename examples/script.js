@@ -1,5 +1,7 @@
 var chart = creed({
   target: '#example',
+  width: window.innerWidth,
+  height: window.innerHeight,
   strokeWidth: d => Math.sqrt(d.value),
   fill: function(data) {
     var color = d3.scale.category20()
