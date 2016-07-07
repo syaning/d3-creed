@@ -144,13 +144,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @private
 	 */
 	proto._renderLinks = function () {
-	  var stroke = valFn(this.stroke);
-	  var strokeWidth = valFn(this.strokeWidth);
+	  var stroke = valFn(this.stroke, this.data);
+	  var strokeWidth = valFn(this.strokeWidth, this.data);
 
 	  var links = this.glink.selectAll('.link').data(this.data.links);
-
-	  // update
-	  // TODO
 
 	  // enter
 	  links.enter().append('line').classed('link', true).attr('stroke', stroke).attr('stroke-width', strokeWidth);
@@ -167,13 +164,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @private
 	 */
 	proto._renderNodes = function () {
-	  var radius = valFn(this.radius);
-	  var fill = valFn(this.fill);
+	  var radius = valFn(this.radius, this.data);
+	  var fill = valFn(this.fill, this.data);
 
 	  var nodes = this.gnode.selectAll('.node').data(this.data.nodes);
-
-	  // update
-	  // TODO
 
 	  // enter
 	  nodes.enter().append('circle').classed('node', true).attr('r', radius).attr('fill', fill);
@@ -193,20 +187,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var self = this;
 
 	  return function tick() {
-	    self.links.attr('x1', function (d) {
-	      return d.source.x;
-	    }).attr('y1', function (d) {
-	      return d.source.y;
-	    }).attr('x2', function (d) {
-	      return d.target.x;
-	    }).attr('y2', function (d) {
-	      return d.target.y;
-	    });
-
-	    self.nodes.attr('transform', function (d) {
-	      return 'translate(' + d.x + ', ' + d.y + ')';
-	    });
+	    self._tickLinks();
+	    self._tickNodes();
 	  };
+	};
+
+	/**
+	 * Links tick function.
+	 *
+	 * @private
+	 */
+	proto._tickLinks = function () {
+	  this.links.attr('x1', function (d) {
+	    return d.source.x;
+	  }).attr('y1', function (d) {
+	    return d.source.y;
+	  }).attr('x2', function (d) {
+	    return d.target.x;
+	  }).attr('y2', function (d) {
+	    return d.target.y;
+	  });
+	};
+
+	/**
+	 * Nodes tick function.
+	 *
+	 * @private
+	 */
+	proto._tickNodes = function () {
+	  this.nodes.attr('transform', function (d) {
+	    return 'translate(' + d.x + ', ' + d.y + ')';
+	  });
 	};
 
 	/**

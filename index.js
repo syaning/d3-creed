@@ -93,14 +93,11 @@ proto.render = function(data) {
  * @private
  */
 proto._renderLinks = function() {
-  var stroke = valFn(this.stroke)
-  var strokeWidth = valFn(this.strokeWidth)
+  var stroke = valFn(this.stroke, this.data)
+  var strokeWidth = valFn(this.strokeWidth, this.data)
 
   var links = this.glink.selectAll('.link')
     .data(this.data.links)
-
-  // update
-  // TODO
 
   // enter
   links.enter()
@@ -121,14 +118,11 @@ proto._renderLinks = function() {
  * @private
  */
 proto._renderNodes = function() {
-  var radius = valFn(this.radius)
-  var fill = valFn(this.fill)
+  var radius = valFn(this.radius, this.data)
+  var fill = valFn(this.fill, this.data)
 
   var nodes = this.gnode.selectAll('.node')
     .data(this.data.nodes)
-
-  // update
-  // TODO
 
   // enter
   nodes.enter()
@@ -136,7 +130,6 @@ proto._renderNodes = function() {
     .classed('node', true)
     .attr('r', radius)
     .attr('fill', fill)
-
 
   // exit
   nodes.exit().remove()
@@ -153,15 +146,31 @@ proto._tick = function() {
   var self = this
 
   return function tick() {
-    self.links
-      .attr('x1', d => d.source.x)
-      .attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x)
-      .attr('y2', d => d.target.y)
-
-    self.nodes
-      .attr('transform', d => `translate(${d.x}, ${d.y})`)
+    self._tickLinks()
+    self._tickNodes()
   }
+}
+
+/**
+ * Links tick function.
+ *
+ * @private
+ */
+proto._tickLinks = function() {
+  this.links
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y)
+}
+
+/**
+ * Nodes tick function.
+ *
+ * @private
+ */
+proto._tickNodes = function() {
+  this.nodes.attr('transform', d => `translate(${d.x}, ${d.y})`)
 }
 
 /**
