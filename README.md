@@ -39,6 +39,22 @@ or in browser:
 </script>
 ```
 
+### Examples
+
+```sh
+$ npm run example
+```
+
+then access [http://localhost:9000/examples/](http://localhost:9000/examples/).
+
+Basic Example:
+
+![](./examples/basic/screenshot.png)
+
+Customized Example:
+
+![](./examples/customize/screenshot.png)
+
 ### API
 
 #### creed(options)
@@ -52,6 +68,64 @@ Render the chart with given data.
 #### chart.clear()
 
 Clear the chart.
+
+### Customization
+
+You could customize every step when rendering the chart.
+
+- customize force
+
+    ```javascript
+    chart.force
+      .charge(-100)
+      .linkDistance(50)
+    ```
+
+- customize links rendering
+
+    ```javascript
+    chart._renderLinks = function() {
+      // ...
+    }
+    ```
+
+- customize nodes rendering
+
+    ```javascript
+    chart._renderNodes = function() {
+      // ...
+    }
+    ```
+
+- customize links ticking
+
+    ```javascript
+    chart._tickLinks = function() {
+      // ...
+    }
+    ```
+
+- customize nodes ticking
+
+    ```javascript
+    chart._tickNodes = function() {
+      // ...
+    }
+    ```
+
+- customize events
+
+  ```javascript
+  // these could be accessed before rendering
+  chart.svg
+  chart.defs
+  chart.glink
+  chart.gnode
+
+  // these could be accessed after rendering
+  chart.nodes
+  chart.links
+  ```
 
 ### License
 
