@@ -8,7 +8,7 @@ var chart = creed({
       .domain(d3.extent(data.nodes, function(d) {
         return d.value;
       }))
-      .range([10, 20]);
+      .range([5, 15]);
 
     return function(d) {
       return scale(d.value);
